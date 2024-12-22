@@ -1,43 +1,46 @@
-import tkinter as tk
+from flask import Flask, request, render_template_string
 
-def calculate_cost():
-    try:
-        pulls = int(pulls_entry.get()) if pulls_entry.get() else 0
-        crystals = int(crystals_entry.get()) if crystals_entry.get() else 0
-        stamina = int(stamina_entry.get()) if stamina_entry.get() else 0
-        leg = int(leg_entry.get()) if leg_entry.get() else 0
-        
+app = Flask(__name__)
+
+HTML_TEMPLATE = """
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Калькулятор стоимости</title>
+  </head>
+  <body>
+    <h1>Рассчитать стоимость пакета</h1>
+    <form method="post">
+      <label>Количество призывов:</label>
+      <input type="number" name="pulls" value="0"><br>
+      <label>Количество кристаллов:</label>
+      <input type="number" name="crystals" value="0"><br>
+      <label>Количество стамины:</label>
+      <input type="number" name="stamina" value="0"><br>
+      <label>Количество лег:</label>
+      <input type="number" name="leg" value="0"><br>
+      <button type="submit">Посчитать стоимость</button>
+    </form>
+    {% if cost is not none %}
+      <h2>Итоговая стоимость: ${{ cost }}</h2>
+    {% endif %}
+  </body>
+</html>
+"""
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    cost = None
+    if request.method == "POST":
+        pulls = int(request.form.get("pulls", 0))
+        crystals = int(request.form.get("crystals", 0))
+        stamina = int(request.form.get("stamina", 0))
+        leg = int(request.form.get("leg", 0))
+
         cost = (pulls * 1) + (crystals * 0.00067) + (stamina * 0.00335) + (leg * 60)
-        result_label.config(text=f"Итоговая стоимость: ${cost:.2f}")
-    except ValueError:
-        result_label.config(text="Пожалуйста, введите корректные значения.")
 
-root = tk.Tk()
-root.title("King Arthur Legend's Rise Cost Calculator")
-root.geometry("400x300")
+    return render_template_string(HTML_TEMPLATE, cost=cost)
 
-# Ввод полей
-tk.Label(root, text="Количество призывов:").pack()
-pulls_entry = tk.Entry(root)
-pulls_entry.pack()
-
-tk.Label(root, text="Количество кристаллов:").pack()
-crystals_entry = tk.Entry(root)
-crystals_entry.pack()
-
-tk.Label(root, text="Количество стамины:").pack()
-stamina_entry = tk.Entry(root)
-stamina_entry.pack()
-
-tk.Label(root, text="Количество лег:").pack()
-leg_entry = tk.Entry(root)
-leg_entry.pack()
-
-# Кнопка расчёта
-tk.Button(root, text="Посчитать стоимость", command=calculate_cost).pack()
-
-# Поле вывода результата
-result_label = tk.Label(root, text="Итоговая стоимость: $0.00")
-result_label.pack()
-
-root.mainloop()
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
