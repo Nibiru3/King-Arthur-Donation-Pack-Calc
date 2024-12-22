@@ -38,7 +38,7 @@ def index():
         stamina = int(request.form.get("stamina", 0))
         leg = int(request.form.get("leg", 0))
 
-        cost = (pulls * 1) + (crystals * 0.00067) + (stamina * 0.00335) + (leg * 60)
+        cost = (pulls * 1) + (crystals * 0.0067) + (stamina * 0.00335) + (leg * 60)
 
     return render_template_string(HTML_TEMPLATE, cost=cost)
 
